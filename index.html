@@ -22,13 +22,11 @@
             padding: 2rem 1rem;
         }
 
-        /* Main Container */
         .container {
             max-width: 700px;
             margin: 0 auto;
         }
 
-        /* Header */
         .header {
             text-align: center;
             margin-bottom: 2rem;
@@ -62,7 +60,6 @@
             margin-top: 0.5rem;
         }
 
-        /* Search Card */
         .search-card {
             background: rgba(18, 25, 45, 0.8);
             backdrop-filter: blur(12px);
@@ -121,7 +118,6 @@
             border-color: #38bdf8;
         }
 
-        /* Loader */
         .loader {
             display: none;
             text-align: center;
@@ -143,7 +139,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Result Cards */
         .result-card {
             background: rgba(18, 25, 45, 0.9);
             backdrop-filter: blur(12px);
@@ -151,10 +146,9 @@
             overflow: hidden;
             border: 1px solid rgba(56, 189, 248, 0.2);
             margin-bottom: 1.5rem;
-            display: none;
+            display: block;
         }
 
-        /* Network Header */
         .network-header {
             padding: 1.2rem 1.5rem;
             display: flex;
@@ -179,7 +173,6 @@
             font-weight: 800;
         }
 
-        /* Info Rows */
         .info-row {
             display: flex;
             padding: 1rem 1.5rem;
@@ -205,7 +198,6 @@
             font-size: 0.95rem;
         }
 
-        /* Developer Footer */
         .developer-footer {
             padding: 0.8rem 1.5rem;
             background: rgba(0,0,0,0.3);
@@ -216,7 +208,7 @@
             border-top: 1px solid rgba(45, 212, 191, 0.2);
         }
 
-        /* Network Specific Colors */
+        /* Network Colors */
         .jazz .network-header { border-bottom-color: #d32f2f; }
         .jazz .network-icon { background: rgba(211, 47, 47, 0.15); color: #d32f2f; }
         .jazz .network-name { color: #d32f2f; }
@@ -233,7 +225,6 @@
         .telenor .network-icon { background: rgba(76, 175, 80, 0.15); color: #4caf50; }
         .telenor .network-name { color: #4caf50; }
 
-        /* Error Message */
         .error-message {
             background: rgba(211, 47, 47, 0.15);
             border: 1px solid rgba(211, 47, 47, 0.3);
@@ -244,7 +235,17 @@
             margin-bottom: 1rem;
         }
 
-        /* Footer */
+        .debug-info {
+            background: rgba(0,0,0,0.5);
+            border-radius: 1rem;
+            padding: 0.8rem;
+            font-size: 0.7rem;
+            color: #7e8aad;
+            margin-top: 1rem;
+            font-family: monospace;
+            display: none;
+        }
+
         .footer {
             text-align: center;
             padding: 1.5rem;
@@ -262,7 +263,6 @@
 <body>
 
 <div class="container">
-    <!-- Header -->
     <div class="header">
         <div class="badge">
             <i class="fas fa-shield-alt"></i> SECURE ANONYMOUS DB
@@ -271,7 +271,6 @@
         <div class="sub">Powered by Anonymous DB | Real-time Subscriber Data</div>
     </div>
 
-    <!-- Search Card -->
     <div class="search-card">
         <div class="input-group">
             <input type="tel" id="mobileInput" placeholder="03xxxxxxxxx (Pakistani Mobile Number)" value="03137665939">
@@ -284,51 +283,60 @@
         </div>
     </div>
 
-    <!-- Loader -->
     <div class="loader" id="loader">
         <div class="spinner"></div>
         <div style="color: #7dd3fc; margin-top: 0.8rem; font-size: 0.8rem;">Fetching subscriber data...</div>
     </div>
 
-    <!-- Result Area -->
     <div id="resultArea"></div>
+    
+    <!-- Debug panel (hidden by default, shows API response) -->
+    <div id="debugInfo" class="debug-info"></div>
 
-    <!-- Footer -->
     <div class="footer">
         <i class="fas fa-database"></i> developer: anonymous_db | Secure SIM Information System
     </div>
 </div>
 
 <script>
-    // API Endpoint - Calls your serverless function
+    // API Endpoint - Your Vercel serverless function
     const API_URL = '/api/sim-info';
-
-    // Network detection based on mobile prefix
+    
+    // Detect network based on mobile prefix
     function detectNetwork(mobile) {
         if (!mobile) return 'Unknown';
         const clean = mobile.toString().replace(/\D/g, '');
-        const prefix = clean.substring(0, 4);
+        const prefix = clean.substring(3, 6);
         
-        const jazzPrefixes = ['0300', '0301', '0302', '0303', '0304', '0305', '0306', '0307', '0308', '0309', '0310', '0311', '0312', '0313', '0314', '0315', '0320', '0321', '0322', '0323', '0324'];
-        const zongPrefixes = ['0316', '0317', '0318', '0319', '0336', '0337', '0338', '0350', '0370'];
-        const ufonePrefixes = ['0330', '0331', '0332', '0333', '0334', '0335', '0340', '0341', '0342', '0343', '0344', '0345', '0346', '0347', '0348'];
-        const telenorPrefixes = ['0349', '030', '034', '0351', '0352', '0353', '0354', '0355', '0356', '0357', '0358', '0359'];
+        console.log('Detecting network for prefix:', prefix);
         
-        if (jazzPrefixes.some(p => prefix.startsWith(p))) return 'Jazz';
-        if (zongPrefixes.some(p => prefix.startsWith(p))) return 'Zong';
-        if (ufonePrefixes.some(p => prefix.startsWith(p))) return 'Ufone';
-        if (telenorPrefixes.some(p => prefix.startsWith(p))) return 'Telenor';
+        // Jazz prefixes
+        const jazzPrefixes = ['300', '301', '302', '303', '304', '305', '306', '307', '308', '309', 
+                              '310', '311', '312', '313', '314', '315', '320', '321', '322', '323', '324', '325'];
+        
+        // Zong prefixes
+        const zongPrefixes = ['316', '317', '318', '319', '336', '337', '338', '350', '370'];
+        
+        // Ufone prefixes
+        const ufonePrefixes = ['330', '331', '332', '333', '334', '335', '340', '341', '342', '343', 
+                               '344', '345', '346', '347', '348'];
+        
+        if (jazzPrefixes.includes(prefix)) return 'Jazz';
+        if (zongPrefixes.includes(prefix)) return 'Zong';
+        if (ufonePrefixes.includes(prefix)) return 'Ufone';
         
         // Additional checks
-        if (prefix.startsWith('031')) return 'Jazz';
-        if (prefix.startsWith('032')) return 'Jazz';
-        if (prefix.startsWith('033')) return 'Ufone';
-        if (prefix.startsWith('034')) return 'Ufone';
+        if (clean.startsWith('031')) {
+            const subPrefix = clean.substring(4, 6);
+            if (subPrefix === '16' || subPrefix === '17' || subPrefix === '18' || subPrefix === '19') return 'Zong';
+            return 'Jazz';
+        }
+        if (clean.startsWith('033')) return 'Ufone';
+        if (clean.startsWith('034')) return 'Ufone';
         
-        return 'Unknown';
+        return 'Telenor';
     }
 
-    // Get network icon
     function getNetworkIcon(network) {
         const icons = {
             'Jazz': 'fa-music',
@@ -340,24 +348,63 @@
         return icons[network] || 'fa-mobile-alt';
     }
 
-    // Render result with network-specific styling
+    function escapeHtml(str) {
+        if (!str) return 'N/A';
+        return String(str).replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    function showError(message) {
+        const resultArea = document.getElementById('resultArea');
+        resultArea.innerHTML = `
+            <div class="error-message">
+                <i class="fas fa-exclamation-circle"></i> ${escapeHtml(message)}
+            </div>
+        `;
+    }
+
     function renderResult(data, mobileNumber) {
         const resultArea = document.getElementById('resultArea');
         
-        if (!data.success || !data.records || data.records.length === 0) {
-            resultArea.innerHTML = `
-                <div class="error-message">
-                    <i class="fas fa-exclamation-triangle"></i> No subscriber data found for ${escapeHtml(mobileNumber)}
-                </div>
-            `;
+        console.log('Rendering data:', data);
+        
+        // Check if data is valid
+        if (!data) {
+            showError('No data received from API');
             return;
         }
         
-        const record = data.records[0];
-        const network = detectNetwork(record.mobile || mobileNumber);
+        // Extract records - API returns { success, count, records: [...] }
+        let records = null;
+        
+        if (data.records && Array.isArray(data.records) && data.records.length > 0) {
+            records = data.records;
+        } else if (data.data && Array.isArray(data.data) && data.data.length > 0) {
+            records = data.data;
+        } else if (data.record) {
+            records = [data.record];
+        }
+        
+        if (!records || records.length === 0) {
+            showError(`No subscriber data found for ${escapeHtml(mobileNumber)}`);
+            return;
+        }
+        
+        const record = records[0];
+        console.log('Record found:', record);
+        
+        const mobile = record.mobile || mobileNumber;
+        const network = detectNetwork(mobile);
         const networkIcon = getNetworkIcon(network);
         
-        // Create network-specific card
+        const name = record.name || record.full_name || record.customer_name || 'Not Available';
+        const cnic = record.cnic || record.id_number || record.cnic_number || 'Not Disclosed';
+        const address = record.address || record.full_address || 'Not Available';
+        
         const html = `
             <div class="result-card ${network.toLowerCase()}" id="resultCard">
                 <div class="network-header">
@@ -377,7 +424,7 @@
                         <i class="fas fa-user"></i> NAME
                     </div>
                     <div class="info-value">
-                        ${escapeHtml(record.name || 'Not Available')}
+                        ${escapeHtml(name)}
                     </div>
                 </div>
                 
@@ -386,7 +433,7 @@
                         <i class="fas fa-mobile-alt"></i> MOBILE
                     </div>
                     <div class="info-value">
-                        ${escapeHtml(record.mobile || mobileNumber)}
+                        ${escapeHtml(mobile)}
                     </div>
                 </div>
                 
@@ -395,7 +442,7 @@
                         <i class="fas fa-id-card"></i> CNIC
                     </div>
                     <div class="info-value">
-                        ${escapeHtml(record.cnic || 'Not Disclosed')}
+                        ${escapeHtml(cnic)}
                     </div>
                 </div>
                 
@@ -404,31 +451,24 @@
                         <i class="fas fa-location-dot"></i> ADDRESS
                     </div>
                     <div class="info-value">
-                        ${escapeHtml(record.address || '—')}
+                        ${escapeHtml(address)}
                     </div>
                 </div>
                 
                 <div class="developer-footer">
-                    <i class="fas fa-code"></i> developer: anonymous_db | ${new Date(data.timestamp || Date.now()).toLocaleString()}
+                    <i class="fas fa-code"></i> developer: anonymous_db | ${new Date().toLocaleString()}
                 </div>
             </div>
         `;
         
         resultArea.innerHTML = html;
+        
+        // Show debug info (hidden by default - press F12 to see)
+        const debugDiv = document.getElementById('debugInfo');
+        debugDiv.style.display = 'block';
+        debugDiv.innerHTML = `<strong>🔍 API Response (Debug):</strong><br><pre style="font-size:0.65rem; overflow-x:auto;">${JSON.stringify(data, null, 2)}</pre>`;
     }
 
-    // Escape HTML to prevent XSS
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
-    }
-
-    // Validate Pakistani mobile number
     function validateMobileNumber(number) {
         if (!number) return false;
         const cleaned = number.toString().trim().replace(/\s+|-/g, '');
@@ -436,47 +476,40 @@
         return pakMobileRegex.test(cleaned);
     }
 
-    // Show error message
-    function showError(message) {
-        const resultArea = document.getElementById('resultArea');
-        resultArea.innerHTML = `
-            <div class="error-message">
-                <i class="fas fa-exclamation-circle"></i> ${escapeHtml(message)}
-            </div>
-        `;
-    }
-
-    // Main search function - Calls YOUR API
     async function searchSimInfo(mobileNumber) {
         const loader = document.getElementById('loader');
         const resultArea = document.getElementById('resultArea');
+        const debugDiv = document.getElementById('debugInfo');
         
-        // Clear previous results
         resultArea.innerHTML = '';
+        debugDiv.style.display = 'none';
         loader.style.display = 'block';
         
-        // Clean mobile number
         const cleanMobile = mobileNumber.toString().trim();
         
         try {
-            // Call YOUR API endpoint (Vercel serverless function)
-            const response = await fetch(`${API_URL}?search=${encodeURIComponent(cleanMobile)}`);
+            const apiUrl = `${API_URL}?search=${encodeURIComponent(cleanMobile)}`;
+            console.log('Calling API:', apiUrl);
+            
+            const response = await fetch(apiUrl);
+            console.log('Response status:', response.status);
             
             if (!response.ok) {
                 throw new Error(`API responded with status ${response.status}`);
             }
             
             const data = await response.json();
+            console.log('API Response:', data);
             
-            if (data.success) {
+            if (data.success === true) {
                 renderResult(data, cleanMobile);
             } else {
-                showError(data.error || 'No subscriber data found for this number.');
+                showError(data.error || data.message || 'No subscriber data found for this number.');
             }
             
         } catch (error) {
             console.error('Search error:', error);
-            showError('Network error or unable to reach API. Please try again.');
+            showError('Network error: ' + error.message);
         } finally {
             loader.style.display = 'none';
         }
@@ -501,10 +534,15 @@
         }
     });
     
-    // Auto-search on load (optional)
+    // Test on page load
     window.addEventListener('load', () => {
-        // Pre-fill example
-        mobileInput.value = '03137665939';
+        console.log('Page loaded, ready to search');
+        // Auto-search example number
+        setTimeout(() => {
+            if (mobileInput.value === '03137665939') {
+                searchSimInfo('03137665939');
+            }
+        }, 500);
     });
 </script>
 </body>
