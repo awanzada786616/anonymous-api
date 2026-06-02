@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>SIM Information Tool | Secure Lookup</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="glass-card">
+    <div class="header">
+        <span class="badge">🔒 SECURE & PRIVATE</span>
+        <h1>SIM Info <span style="color:#2dd4bf;">·</span> Database</h1>
+        <div class="sub">Anonymous subscriber details | API hidden from client</div>
+    </div>
+
+    <div class="search-area">
+        <div class="input-group">
+            <input type="tel" id="mobileInput" placeholder="Enter Pakistani mobile number (e.g., 03007958868)" value="03007958868" autocomplete="off">
+            <button id="searchBtn" aria-label="Search">
+                <span>🔍</span> Search
+            </button>
+        </div>
+        <div style="font-size: 0.7rem; margin-top: 0.6rem; padding-left: 0.5rem;">
+            * Pakistani format: 03xxxxxxxxx | Secure backend proxy
+        </div>
+    </div>
+
+    <div id="loaderArea" style="display: none;">
+        <div class="loader">
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <div id="resultArea" class="result-container">
+        <!-- dynamic results appear here -->
+        <div class="info-placeholder">
+            <span>✨ Enter a number and click search</span>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        <div class="developer-credit">
+            📁 developer: anonymous_db
+        </div>
+        <div class="api-status">
+            🔒 proxy secured | no exposed API
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
